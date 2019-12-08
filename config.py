@@ -14,9 +14,13 @@ class Config(object):
 
         self.DATA_PATH = os.path.abspath(os.path.join(_CURRENT_DIR, "data"))
 
+        self.DOC_PATH = os.path.abspath(os.path.join(_CURRENT_DIR, "docs"))
+
         self.DRIVING_LOG_PATH = os.path.join(self.DATA_PATH, "driving_log.csv")
 
         self.IMAGE_PATH = os.path.join(self.DATA_PATH, "IMG")
+
+        self.SAVED_MODELS = os.path.join(self.CURRENT_DIR, "saved_models/best_model.h5")
 
     def display(self):
         """

@@ -1,0 +1,7 @@
+albumentations
+Flask
+matplotlib
+scikit-learn
+seaborn
+tqdm
+ImageHash
