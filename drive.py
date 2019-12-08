@@ -26,9 +26,9 @@ class SimplePIController:
     def __init__(self, Kp, Ki):
         self.Kp = Kp
         self.Ki = Ki
-        self.set_point = 0.
-        self.error = 0.
-        self.integral = 0.
+        self.set_point = 0.0
+        self.error = 0.0
+        self.integral = 0.0
 
     def set_desired(self, desired):
         self.set_point = desired
@@ -48,7 +48,7 @@ set_speed = 9
 controller.set_desired(set_speed)
 
 
-@sio.on('telemetry')
+@sio.on("telemetry")
 def telemetry(sid, data):
     if data:
         # The current steering angle of the car
@@ -69,59 +69,48 @@ def telemetry(sid, data):
         send_control(steering_angle, throttle)
 
         # save frame
-        if args.image_folder != '':
-            timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
+        if args.image_folder != "":
+            timestamp = datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S_%f")[:-3]
             image_filename = os.path.join(args.image_folder, timestamp)
-            image.save('{}.jpg'.format(image_filename))
+            image.save("{}.jpg".format(image_filename))
     else:
         # NOTE: DON'T EDIT THIS.
-        sio.emit('manual', data={}, skip_sid=True)
+        sio.emit("manual", data={}, skip_sid=True)
 
 
-@sio.on('connect')
+@sio.on("connect")
 def connect(sid, environ):
     print("connect ", sid)
     send_control(0, 0)
 
 
 def send_control(steering_angle, throttle):
-    sio.emit(
-        "steer",
-        data={
-            'steering_angle': steering_angle.__str__(),
-            'throttle': throttle.__str__()
-        },
-        skip_sid=True)
+    sio.emit("steer", data={"steering_angle": steering_angle.__str__(), "throttle": throttle.__str__()}, skip_sid=True)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Remote Driving')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Remote Driving")
+    parser.add_argument("model", type=str, help="Path to model h5 file. Model should be on the same path.")
     parser.add_argument(
-        'model',
+        "image_folder",
         type=str,
-        help='Path to model h5 file. Model should be on the same path.'
-    )
-    parser.add_argument(
-        'image_folder',
-        type=str,
-        nargs='?',
-        default='',
-        help='Path to image folder. This is where the images from the run will be saved.'
+        nargs="?",
+        default="",
+        help="Path to image folder. This is where the images from the run will be saved.",
     )
     args = parser.parse_args()
 
     # check that model Keras version is same as local Keras version
-    f = h5py.File(args.model, mode='r')
-    model_version = f.attrs.get('keras_version')
-    keras_version = str(keras_version).encode('utf8')
+    f = h5py.File(args.model, mode="r")
+    model_version = f.attrs.get("keras_version")
+    keras_version = str(keras_version).encode("utf8")
 
     if model_version != keras_version:
-        print('You are using Keras version ', keras_version,
-              ', but the model was built using ', model_version)
+        print("You are using Keras version ", keras_version, ", but the model was built using ", model_version)
 
     model = load_model(args.model)
 
-    if args.image_folder != '':
+    if args.image_folder != "":
         print("Creating image folder at {}".format(args.image_folder))
         if not os.path.exists(args.image_folder):
             os.makedirs(args.image_folder)
@@ -136,4 +125,4 @@ if __name__ == '__main__':
     app = socketio.Middleware(sio, app)
 
     # deploy as an eventlet WSGI server
-    eventlet.wsgi.server(eventlet.listen(('', 4567)), app)
+    eventlet.wsgi.server(eventlet.listen(("", 4567)), app)

@@ -20,6 +20,5 @@ class BehavioralDataset(object):
             self.lines = [line for line in reader]
 
         print("loading data ...")
-        self.images = [cv2.imread(os.path.join(path_to_data, line[0]))
-                       for line in self.lines]
+        self.images = [cv2.imread(os.path.join(path_to_data, line[0])) for line in self.lines]
         self.measurements = [float(line[3]) for line in self.lines]
