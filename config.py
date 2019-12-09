@@ -22,9 +22,9 @@ class Config(object):
 
         self.SAVED_MODELS = os.path.join(self.CURRENT_DIR, "saved_models/best_model.h5")
 
-        self.EPOCHS = 50
+        self.EPOCHS = 100
 
-        self.BATCH_SIZE = 32
+        self.BATCH_SIZE = 128
 
     def display(self):
         """
