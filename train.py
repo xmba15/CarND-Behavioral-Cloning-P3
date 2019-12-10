@@ -67,9 +67,9 @@ def main():
     history = model.fit_generator(
         batch_generator(x_train, y_train, dt_config.BATCH_SIZE),
         epochs=dt_config.EPOCHS,
-        steps_per_epoch=(20000-1)//dt_config.BATCH_SIZE + 1,
+        steps_per_epoch=(20000 - 1) // dt_config.BATCH_SIZE + 1,
         validation_data=batch_generator(x_val, y_val, dt_config.BATCH_SIZE, False),
-        validation_steps=(len(x_val)-1)//dt_config.BATCH_SIZE + 1,
+        validation_steps=(len(x_val) - 1) // dt_config.BATCH_SIZE + 1,
         callbacks=callbacks,
     )
 

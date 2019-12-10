@@ -14,7 +14,7 @@ from albumentations import (
     RandomSunFlare,
     RandomShadow,
     CoarseDropout,
-    Equalize
+    Equalize,
 )
 
 
@@ -44,27 +44,30 @@ def augment_data(image, steering_angle):
 
     result_image, result_steering_angle = random_flip(result_image, result_steering_angle)
     result_image, result_steering_angle = random_translate(result_image, result_steering_angle)
-    aug = Compose([
-        GaussianBlur(blur_limit=5, p=0.5),
-        RandomBrightness(limit=0.1, p=0.5),
-        RandomContrast(limit=0.1, p=0.5),
-        CLAHE(p=0.5),
-        Equalize(p=0.5),
-        RandomSnow(p=0.5),
-        RandomRain(p=0.5),
-        RandomFog(p=0.5),
-        RandomSunFlare(p=0.5),
-        RandomShadow(p=0.5),
-        CoarseDropout(
-            max_holes=8,
-            max_height=h // 10,
-            max_width=w // 10,
-            min_holes=3,
-            min_height=h // 20,
-            min_width=w // 20,
-            p=0.5,
-        )
-    ], p=1)
+    aug = Compose(
+        [
+            GaussianBlur(blur_limit=5, p=0.5),
+            RandomBrightness(limit=0.1, p=0.5),
+            RandomContrast(limit=0.1, p=0.5),
+            CLAHE(p=0.5),
+            Equalize(p=0.5),
+            RandomSnow(p=0.5),
+            RandomRain(p=0.5),
+            RandomFog(p=0.5),
+            RandomSunFlare(p=0.5),
+            RandomShadow(p=0.5),
+            CoarseDropout(
+                max_holes=8,
+                max_height=h // 10,
+                max_width=w // 10,
+                min_holes=3,
+                min_height=h // 20,
+                min_width=w // 20,
+                p=0.5,
+            ),
+        ],
+        p=1,
+    )
     result_image = aug(image=result_image)["image"]
 
     return result_image, result_steering_angle

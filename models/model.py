@@ -23,7 +23,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l1
 
 
-def BehavioralModel(input_shape, opt=Adam(0.0001, 0.5)):
+def BehavioralModel(input_shape=(160, 320, 3), opt=Adam(0.0001, 0.5)):
     model_input = Input(shape=input_shape)
     x = Cropping2D(cropping=((50, 20), (0, 0)))(model_input)
 
@@ -58,7 +58,7 @@ def BehavioralModel(input_shape, opt=Adam(0.0001, 0.5)):
     x = LeakyReLU(alpha=0.2)(x)
     x = Dropout(0.5)(x)
 
-    x = Dense(50,  kernel_initializer="he_normal", activity_regularizer=l1(0.001))(x)
+    x = Dense(50, kernel_initializer="he_normal", activity_regularizer=l1(0.001))(x)
     x = BatchNormalization(momentum=0.8)(x)
     x = LeakyReLU(alpha=0.2)(x)
     x = Dropout(0.3)(x)

@@ -20,6 +20,8 @@ class Config(object):
 
         self.IMAGE_PATH = os.path.join(self.DATA_PATH, "IMG")
 
+        self.RESULT_IMAGE_PATH = os.path.join(self.DATA_PATH, "results")
+
         self.SAVED_MODELS = os.path.join(self.CURRENT_DIR, "saved_models/best_model.h5")
 
         self.EPOCHS = 100
