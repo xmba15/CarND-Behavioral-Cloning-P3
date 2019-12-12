@@ -10,9 +10,11 @@ from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, Early
 
 
 def load_data(dataset):
-    x_train, y_train = dataset.load_data_with_bias()
-    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42)
-    return x_train, x_val, y_train, y_val
+    triple_x_train, y_train = dataset.load_data()
+    triple_x_train, triple_x_val, y_train, y_val = train_test_split(
+        triple_x_train, y_train, test_size=0.2, random_state=42
+    )
+    return triple_x_train, triple_x_val, y_train, y_val
 
 
 def plot_history(history):
@@ -53,23 +55,28 @@ def plot_history(history):
 def main():
     dt_config = Config()
     dataset = BehavioralDataset(path_to_data=dt_config.DATA_PATH)
-    x_train, x_val, y_train, y_val = load_data(dataset)
+    triple_x_train, triple_x_val, y_train, y_val = load_data(dataset)
 
     model = BehavioralModel(input_shape=(160, 320, 3))
     callbacks = [
         ModelCheckpoint(
-            dt_config.SAVED_MODELS, monitor="val_loss", verbose=1, save_best_only=True, mode="auto", period=1
+            os.path.join(dt_config.SAVED_MODELS_PATH, "model-{epoch:03d}.h5"),
+            monitor="val_loss",
+            verbose=1,
+            save_best_only=True,
+            mode="auto",
+            period=1,
         ),
-        ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=10, verbose=0, mode="auto", min_lr=0.00001),
+        ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=7, verbose=0, mode="auto", min_lr=0.00001),
         EarlyStopping(monitor="val_loss", min_delta=0, patience=15, verbose=0, mode="auto"),
     ]
 
     history = model.fit_generator(
-        batch_generator(x_train, y_train, dt_config.BATCH_SIZE),
+        batch_generator(triple_x_train, y_train, dt_config.BATCH_SIZE),
         epochs=dt_config.EPOCHS,
-        steps_per_epoch=(20000 - 1) // dt_config.BATCH_SIZE + 1,
-        validation_data=batch_generator(x_val, y_val, dt_config.BATCH_SIZE, False),
-        validation_steps=(len(x_val) - 1) // dt_config.BATCH_SIZE + 1,
+        steps_per_epoch=len(triple_x_train) * 6 // dt_config.BATCH_SIZE + 1,
+        validation_data=batch_generator(triple_x_val, y_val, dt_config.BATCH_SIZE, False),
+        validation_steps=(len(triple_x_val) - 1) // dt_config.BATCH_SIZE + 1,
         callbacks=callbacks,
     )
 

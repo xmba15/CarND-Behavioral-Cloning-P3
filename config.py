@@ -22,11 +22,13 @@ class Config(object):
 
         self.RESULT_IMAGE_PATH = os.path.join(self.DATA_PATH, "results")
 
-        self.SAVED_MODELS = os.path.join(self.CURRENT_DIR, "saved_models/best_model.h5")
+        self.SAVED_MODELS_PATH = os.path.join(self.CURRENT_DIR, "saved_models")
+
+        self.SAVED_MODELS = os.path.join(self.SAVED_MODELS_PATH, "model-038.h5")
 
         self.EPOCHS = 100
 
-        self.BATCH_SIZE = 128
+        self.BATCH_SIZE = 64
 
     def display(self):
         """

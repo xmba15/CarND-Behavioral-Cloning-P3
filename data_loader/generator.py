@@ -16,6 +16,7 @@ from albumentations import (
     CoarseDropout,
     Equalize,
 )
+from sklearn.utils import shuffle
 
 
 def random_flip(image, steering_angle):
@@ -43,26 +44,26 @@ def augment_data(image, steering_angle):
     result_steering_angle = steering_angle
 
     result_image, result_steering_angle = random_flip(result_image, result_steering_angle)
-    result_image, result_steering_angle = random_translate(result_image, result_steering_angle)
+    # result_image, result_steering_angle = random_translate(result_image, result_steering_angle)
     aug = Compose(
         [
-            GaussianBlur(blur_limit=5, p=0.5),
+            # GaussianBlur(blur_limit=5, p=0.5),
             RandomBrightness(limit=0.1, p=0.5),
             RandomContrast(limit=0.1, p=0.5),
-            CLAHE(p=0.5),
-            Equalize(p=0.5),
-            RandomSnow(p=0.5),
-            RandomRain(p=0.5),
-            RandomFog(p=0.5),
-            RandomSunFlare(p=0.5),
+            # CLAHE(p=0.5),
+            # Equalize(p=0.5),
+            # RandomSnow(p=0.5),
+            # RandomRain(p=0.5),
+            # RandomFog(p=0.5),
+            # RandomSunFlare(p=0.5),
             RandomShadow(p=0.5),
             CoarseDropout(
-                max_holes=8,
-                max_height=h // 10,
-                max_width=w // 10,
-                min_holes=3,
-                min_height=h // 20,
-                min_width=w // 20,
+                max_holes=4,
+                max_height=h // 30,
+                max_width=w // 30,
+                min_holes=1,
+                min_height=h // 40,
+                min_width=w // 40,
                 p=0.5,
             ),
         ],
@@ -73,19 +74,31 @@ def augment_data(image, steering_angle):
     return result_image, result_steering_angle
 
 
-def batch_generator(images, steering_angles, batch_size, is_training=True):
-    total, h, w, c = images.shape
+STEERING_OFFSET = [0, 0.4, -0.4]
+
+
+def choose_image(triple, steering_angle):
+    no = np.random.randint(3)
+    return triple[no], steering_angle + STEERING_OFFSET[no]
+
+
+def batch_generator(triples, steering_angles, batch_size, is_training=True):
+    total = len(triples)
+    h, w, c = triples.shape[2:]
 
     result_images = np.empty([batch_size, h, w, c])
     result_steer_angles = np.empty(batch_size)
     while True:
         i = 0
         for idx in np.random.permutation(total):
-            image = images[idx]
+            triple = triples[idx]
             steering_angle = steering_angles[idx]
 
             if is_training and np.random.rand() < 0.6:
+                image, steering_angle = choose_image(triple, steering_angle)
                 image, steering_angle = augment_data(image, steering_angle)
+            else:
+                image = triple[0]
 
             result_images[i] = image
             result_steer_angles[i] = steering_angle

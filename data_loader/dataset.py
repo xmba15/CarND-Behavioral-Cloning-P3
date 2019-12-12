@@ -50,43 +50,41 @@ class BehavioralDataset(object):
         return cv2.imread(center_image_path), cv2.imread(left_image_path), cv2.imread(right_image_path), measurement
 
     def load_data(self):
-        print("loading data ...")
-        center_images = []
-        left_images = []
-        right_images = []
+        triples = []
         measurements = []
 
         for idx in tqdm(range(self.__len__())):
             center_image, left_image, right_image, measurement = self.__getitem__(idx)
-            center_images.append(center_image)
-            left_images.append(left_image)
-            right_images.append(right_image)
+            center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
+            left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
+            right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
+            triples.append([center_image, left_image, right_image])
             measurements.append(measurement)
 
-        return np.asarray(center_images), np.asarray(left_images), np.asarray(right_images), np.asarray(measurements)
+        return np.asarray(triples), np.asarray(measurements)
 
-    def load_data_with_bias(self):
-        center_images, left_images, right_images, measurements = self.load_data()
+    # def load_data_with_bias(self):
+    #     center_images, left_images, right_images, measurements = self.load_data()
 
-        add_idx = np.where((measurements > self.left_offset) | (measurements < self.right_offset))
-        x_train = center_images[add_idx]
-        y_train = measurements[add_idx]
+    #     add_idx = np.where((measurements > self.left_offset) | (measurements < self.right_offset))
+    #     x_train = center_images[add_idx]
+    #     y_train = measurements[add_idx]
 
-        process_idx = np.where((self.right_offset <= measurements) & (measurements <= self.left_offset))
-        keep_indices, remove_indices = remove_near_duplicate_images(center_images[process_idx])
-        remove_indices_length = len(remove_indices)
+    #     process_idx = np.where((self.right_offset <= measurements) & (measurements <= self.left_offset))
+    #     keep_indices, remove_indices = remove_near_duplicate_images(center_images[process_idx])
+    #     remove_indices_length = len(remove_indices)
 
-        x_train = np.concatenate((x_train, center_images[process_idx][keep_indices]))
-        y_train = np.append(y_train, measurements[process_idx][keep_indices])
+    #     x_train = np.concatenate((x_train, center_images[process_idx][keep_indices]))
+    #     y_train = np.append(y_train, measurements[process_idx][keep_indices])
 
-        np.random.seed(15)
-        left_idx = np.random.choice(range(remove_indices_length), remove_indices_length // 2, replace=False)
-        right_idx = np.array([i for i in range(remove_indices_length) if i not in left_idx])
+    #     np.random.seed(15)
+    #     left_idx = np.random.choice(range(remove_indices_length), remove_indices_length // 2, replace=False)
+    #     right_idx = np.array([i for i in range(remove_indices_length) if i not in left_idx])
 
-        x_train = np.concatenate((x_train, left_images[process_idx][remove_indices][left_idx]))
-        y_train = np.append(y_train, measurements[process_idx][remove_indices][left_idx] + self.left_offset)
+    #     x_train = np.concatenate((x_train, left_images[process_idx][remove_indices][left_idx]))
+    #     y_train = np.append(y_train, measurements[process_idx][remove_indices][left_idx] + self.left_offset)
 
-        x_train = np.concatenate((x_train, right_images[process_idx][remove_indices][right_idx]))
-        y_train = np.append(y_train, measurements[process_idx][remove_indices][right_idx] + self.right_offset)
+    #     x_train = np.concatenate((x_train, right_images[process_idx][remove_indices][right_idx]))
+    #     y_train = np.append(y_train, measurements[process_idx][remove_indices][right_idx] + self.right_offset)
 
-        return x_train, y_train
+    #     return x_train, y_train

@@ -1,14 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from moviepy.editor import ImageSequenceClip
-import argparse
 import os
+import argparse
+from config import Config
 
 IMAGE_EXT = ["jpeg", "gif", "png", "jpg"]
 
 
 def main():
+    dt_config = Config()
     parser = argparse.ArgumentParser(description="Create driving video.")
     parser.add_argument(
-        "image_folder", type=str, default="", help="Path to image folder. The video will be created from these images."
+        "--image_folder",
+        type=str,
+        default=dt_config.RESULT_IMAGE_PATH,
+        help="Path to image folder. The video will be created from these images.",
     )
     parser.add_argument("--fps", type=int, default=60, help="FPS (Frames per second) setting for the video.")
     args = parser.parse_args()
